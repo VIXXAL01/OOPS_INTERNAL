@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Registration System</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .btn { background-color: #007BFF; color: white; padding: 8px 16px; border: none; cursor: pointer; margin: 2px; }
+    .btn:hover { background-color: #0056b3; }
+    #formContainer { display: none; margin-top: 20px; }
+    input, select { padding: 5px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Complaint Registration System</h1>
+  <button class="btn" onclick="toggleForm()">Add Complaint</button>
+
+  <div id="formContainer">
+    <h3 id="formTitle">Add New Complaint</h3>
+    <input type="number" id="complaintId" placeholder="Complaint ID">
+    <input type="text" id="description" placeholder="Description">
+    <select id="status">
+      <option value="open">Open</option>
+      <option value="resolved">Resolved</option>
+    </select>
+    <button class="btn" onclick="submitComplaint()" id="submitButton">Submit</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Complaint ID</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="complaintTable"></tbody>
+  </table>
+
+  <script>
+    let complaints = [];
+    let isEditing = false;
+    let editIndex = -1;
+
+    function toggleForm() {
+      const form = document.getElementById('formContainer');
+      document.getElementById('formTitle').innerText = 'Add New Complaint';
+      document.getElementById('submitButton').innerText = 'Submit';
+      isEditing = false;
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      clearForm();
+    }
+
+    function submitComplaint() {
+      const id = document.getElementById('complaintId').value;
+      const desc = document.getElementById('description').value;
+      const status = document.getElementById('status').value;
+
+      if (id && desc && status) {
+        if (isEditing) {
+          complaints[editIndex] = { id, desc, status };
+          isEditing = false;
+          editIndex = -1;
+          document.getElementById('formTitle').innerText = 'Add New Complaint';
+          document.getElementById('submitButton').innerText = 'Submit';
+        } else {
+          complaints.push({ id, desc, status });
+        }
+        displayComplaints();
+        clearForm();
+        document.getElementById('formContainer').style.display = 'none';
+      } else {
+        alert('Please fill all fields.');
+      }
+    }
+
+    function displayComplaints() {
+      const table = document.getElementById('complaintTable');
+      table.innerHTML = '';
+      complaints.forEach((c, index) => {
+        const row = `<tr>
+          <td>${c.id}</td>
+          <td>${c.desc}</td>
+          <td>${c.status}</td>
+          <td>
+            <button class='btn' onclick='editComplaint(${index})'>Edit</button>
+          </td>
+        </tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    function editComplaint(index) {
+      const c = complaints[index];
+      document.getElementById('complaintId').value = c.id;
+      document.getElementById('description').value = c.desc;
+      document.getElementById('status').value = c.status;
+      document.getElementById('formTitle').innerText = 'Update Complaint';
+      document.getElementById('submitButton').innerText = 'Update';
+      document.getElementById('formContainer').style.display = 'block';
+      isEditing = true;
+      editIndex = index;
+    }
+
+    function clearForm() {
+      document.getElementById('complaintId').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('status').value = 'open';
+    }
+  </script>
+</body>
+</html>
